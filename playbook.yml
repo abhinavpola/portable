@@ -1,0 +1,50 @@
+- hosts: local
+  become: false
+
+  vars:
+    homebrew_packages:
+      - nushell
+      - git-town
+      - gh
+      - bat
+      - orbstack
+      - pnpm
+      - npm
+      - nvm
+      - xh
+
+  tasks:
+    - name: Ensure Homebrew is installed
+      shell: |
+        if ! command -v brew >/dev/null 2>&1; then
+          /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+        fi
+      args:
+        executable: /bin/zsh
+
+    - name: Install Homebrew packages
+      community.general.homebrew:
+        name: "{{ homebrew_packages }}"
+        state: present
+
+    - name: Install uv
+      shell: curl -LsSf https://astral.sh/uv/install.sh | sh
+      args:
+        executable: /bin/zsh
+
+    - name: Get Nushell config dir from Nushell
+      command: nu -c 'echo ($nu.config-path | path dirname)'
+      register: nu_config_dir_cmd
+      changed_when: false
+
+    - name: Ensure Nushell config directory exists
+      file:
+        path: "{{ nu_config_dir_cmd.stdout }}"
+        state: directory
+        mode: "0755"
+
+    - name: Install Nushell config.nu overrides
+      copy:
+        src: files/config.nu
+        dest: "{{ nu_config_dir_cmd.stdout }}/config.nu"
+        mode: "0644"
