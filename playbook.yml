@@ -12,6 +12,7 @@
       - npm
       - nvm
       - xh
+      - starship
 
   tasks:
     - name: Ensure Homebrew is installed
@@ -25,6 +26,11 @@
     - name: Install Homebrew packages
       community.general.homebrew:
         name: "{{ homebrew_packages }}"
+        state: present
+
+    - name: Install Hack Nerd Font
+      community.general.homebrew_cask:
+        name: font-hack-nerd-font
         state: present
 
     - name: Install uv
