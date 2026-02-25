@@ -28,10 +28,13 @@
         name: "{{ homebrew_packages }}"
         state: present
 
-    - name: Install Hack Nerd Font
+    - name: Install Homebrew casks
       community.general.homebrew_cask:
-        name: font-hack-nerd-font
+        name: "{{ item }}"
         state: present
+      loop:
+        - font-hack-nerd-font
+        - ghostty
 
     - name: Install uv
       shell: curl -LsSf https://astral.sh/uv/install.sh | sh
@@ -53,4 +56,42 @@
       copy:
         src: files/config.nu
         dest: "{{ nu_config_dir_cmd.stdout }}/config.nu"
+        mode: "0644"
+
+    - name: Ensure Ghostty config directory exists
+      file:
+        path: "{{ ansible_env.HOME }}/Library/Application Support/com.mitchellh.ghostty"
+        state: directory
+        mode: "0755"
+
+    - name: Install Ghostty config
+      copy:
+        src: files/ghostty-config
+        dest: "{{ ansible_env.HOME }}/Library/Application Support/com.mitchellh.ghostty/config"
+        mode: "0644"
+
+    - name: Install git-town aliases in gitconfig
+      blockinfile:
+        path: "{{ ansible_env.HOME }}/.gitconfig"
+        marker: "# {mark} PORTABLE GIT-TOWN ALIASES"
+        block: |
+          [alias]
+          	append = town append
+          	compress = town compress
+          	contribute = town contribute
+          	diff-parent = town diff-parent
+          	down = town down
+          	hack = town hack
+          	delete = town delete
+          	observe = town observe
+          	park = town park
+          	prepend = town prepend
+          	propose = town propose
+          	rename = town rename
+          	repo = town repo
+          	set-parent = town set-parent
+          	ship = town ship
+          	sync = town sync
+          	up = town up
+        create: true
         mode: "0644"
