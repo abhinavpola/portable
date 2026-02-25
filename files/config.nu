@@ -38,6 +38,9 @@ alias cat = bat
 alias gt = git-town
 alias gts = git push --force-with-lease
 alias ghme = gh pr list --author @me --state open
+alias gcm = git checkout main
+alias gco = git town switch
+alias gtb = git town branch
 
 def gtms [] {
     gtma
